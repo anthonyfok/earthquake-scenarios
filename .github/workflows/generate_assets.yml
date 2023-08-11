@@ -14,15 +14,22 @@ jobs:
   upload-release-assets:
     runs-on: ubuntu-latest
     steps:
-      - name: Make more room by deleting unused software
-        run: |
-          set -x
-          df -h
-          du -csh /usr/share/dotnet
-          du -csh /usr/local/lib/android
-          sudo eatmydata rm -f -r /usr/share/dotnet
-          sudo eatmydata rm -f -r /usr/local/lib/android
-          df -h
+      - name: Check disk space before
+        run: df -h
+
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+
+      - name: Check disk space after
+        run: df -h
 
       - name: Checkout earthquake-scenarios repository
         uses: actions/checkout@v3
